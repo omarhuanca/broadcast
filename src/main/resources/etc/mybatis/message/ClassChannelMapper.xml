@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.umss.app.br.broadcast.dao.message.classchannel.MClassChannelMapper">
+    <!--  Result Maps -->
+    <resultMap id="ClassChannelsMap" type="io.umss.app.br.broadcast.core.message.ClassChannel">
+        <id     column="mscc_uid"              property="uid"            javaType="long"/>
+        <result column="mscc_status"           property="status"         javaType="int"/>
+        <result column="mscc_name"             property="name"           javaType="string"/>
+        <result column="mscc_create_date"      property="createDate"     javaType="java.sql.Timestamp"/>
+        <result column="mscc_last_update_date" property="lastUpdateDate" javaType="java.sql.Timestamp"/>
+    </resultMap>
+
+    <resultMap id="SimpleClassChannelMap" type="io.umss.app.br.broadcast.core.message.ClassChannel">
+        <id     column="mscc_uid"              property="uid"            javaType="long"/>
+        <result column="mscc_status"           property="status"         javaType="int"/>
+        <result column="mscc_name"             property="name"           javaType="string"/>
+        <result column="mscc_create_date"      property="createDate"     javaType="java.sql.Timestamp"/>
+        <result column="mscc_last_update_date" property="lastUpdateDate" javaType="java.sql.Timestamp"/>
+    </resultMap>
+
+    <!-- Queries -->
+    <select id="getRecordById" resultMap="SimpleClassChannelMap">
+        <![CDATA[
+            SELECT *
+              FROM mscc_class_channel
+        ]]>
+        <where>
+               AND mscc_uid = #{recordId}
+        </where>
+    </select>
+
+    <select id="getAllRecords" resultMap="ClassChannelsMap">
+        <![CDATA[
+            SELECT *
+              FROM (
+        ]]>
+        <include refid="sqlGetAllRecords"/>
+        <![CDATA[
+                   ) AS records
+          ORDER BY mscc_uid
+        ]]>
+        <if test="limit != null">
+             LIMIT ${limit} OFFSET ${offset}
+        </if>
+    </select>
+
+    <select id="getCountAllRecords" resultType="int">
+        <![CDATA[
+            SELECT COUNT(DISTINCT mscc_uid)
+              FROM (
+        ]]>
+        <include refid="sqlGetAllRecords"/>
+        <![CDATA[
+                   ) AS records
+        ]]>
+    </select>
+
+    <sql id="sqlGetAllRecords">
+        <![CDATA[
+            SELECT *
+              FROM mscc_class_channel
+        ]]>
+        <where>
+            <if test="recordStatus != null">
+               AND mscc_status = #{recordStatus}
+            </if>
+            <if test="recordName != null">
+               AND mscc_name LIKE '%' || #{recordName} || '%'
+            </if>
+        </where>
+    </sql>
+
+    <insert id="saveRecord" useGeneratedKeys="true" keyProperty="uid">
+        <![CDATA[
+            INSERT INTO mscc_class_channel
+                       (mscc_uid,
+                        mscc_status,
+                        mscc_name)
+                VALUES (#{classChannel.uid},
+                        #{classChannel.status},
+                        #{classChannel.name});
+        ]]>
+    </insert>
+
+    <update id="updateRecord">
+        <![CDATA[
+          UPDATE mscc_class_channel
+        ]]>
+        <set>
+            <if test="classChannel.status != null">
+                 mscc_status = #{classChannel.status},
+            </if>
+            <if test="classChannel.name != null">
+                 mscc_name = #{classChannel.name},
+            </if>
+                 mscc_last_update_date = CURRENT_TIMESTAMP
+        </set>
+        <where>
+                 mscc_uid = #{classChannel.uid}
+        </where>
+    </update>
+
+    <delete id="deleteRecord">
+        <![CDATA[
+         UPDATE mscc_class_channel
+        ]]>
+        <set>
+                mscc_status = 0,
+                mscc_last_update_date = CURRENT_TIMESTAMP
+        </set>
+        <where>
+                mscc_uid = #{classChannel.uid}
+        </where>
+    </delete>
+
+    <select id="getNextVal" resultType="java.lang.Long">
+        SELECT NEXTVAL('mscc_seq')
+    </select>
+</mapper>
