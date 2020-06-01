@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
  * @since 1.0
  */
 @Configuration
-@MapperScan({ "io.umss.app.br.broadcast.admin", "io.umss.app.br.broadcast.message" })
+@MapperScan({ "io.umss.app.br.broadcast.dao.admin", "io.umss.app.br.broadcast.dao.message" })
 public class MyBatisConfig {
 
 }

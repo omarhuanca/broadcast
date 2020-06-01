@@ -1,0 +1,49 @@
+package io.umss.app.br.broadcast.service.message;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import io.umss.app.br.broadcast.core.message.ClassChannel;
+import io.umss.app.br.broadcast.dao.message.classchannel.RClassChannelRepository;
+import io.umss.app.br.broadcast.util.exception.RepositoryException;
+
+/**
+ * ClassChannelService
+ * 
+ * @author Omar Huanca
+ * @since 1.0
+ */
+@Service
+public class ClassChannelService {
+
+    @Autowired
+    RClassChannelRepository repository;
+
+    public ClassChannel getObjectById(Optional<Long> id) throws RepositoryException {
+        return repository.getObjectById(id);
+    }
+
+    public List<ClassChannel> getAllObjects(Optional<Integer> status, Optional<String> name, Integer pageSize,
+            Integer pageNumber) throws RepositoryException {
+        return repository.getAllObjects(status, name, pageSize, pageNumber);
+    }
+
+    public Integer getCountAllObjects(Optional<Integer> status, Optional<String> name) throws RepositoryException {
+        return repository.getCountAllObjects(status, name);
+    }
+
+    public ClassChannel save(ClassChannel object) throws RepositoryException {
+        return repository.save(object);
+    }
+
+    public ClassChannel update(ClassChannel object) throws RepositoryException {
+        return repository.update(object);
+    }
+
+    public void delete(ClassChannel object) throws RepositoryException {
+        repository.delete(object);
+    }
+}
