@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.umss.app.br.broadcast.dao.message.category.MCategoryMapper">
+    <!--  Result Maps -->
+    <resultMap id="CategoriesMap" type="io.umss.app.br.broadcast.core.message.Category">
+        <id     column="msct_uid"              property="uid"            javaType="long"/>
+        <result column="msct_status"           property="status"         javaType="int"/>
+        <result column="msct_name"             property="name"           javaType="string"/>
+        <result column="msct_create_date"      property="createDate"     javaType="java.sql.Timestamp"/>
+        <result column="msct_last_update_date" property="lastUpdateDate" javaType="java.sql.Timestamp"/>
+    </resultMap>
+
+    <resultMap id="SimpleCategoryMap" type="io.umss.app.br.broadcast.core.message.Category">
+        <id     column="msct_uid"              property="uid"            javaType="long"/>
+        <result column="msct_status"           property="status"         javaType="int"/>
+        <result column="msct_name"             property="name"           javaType="string"/>
+        <result column="msct_create_date"      property="createDate"     javaType="java.sql.Timestamp"/>
+        <result column="msct_last_update_date" property="lastUpdateDate" javaType="java.sql.Timestamp"/>
+    </resultMap>
+
+    <!-- Queries -->
+    <select id="getRecordById" resultMap="SimpleCategoryMap">
+        <![CDATA[
+            SELECT *
+              FROM msct_category
+        ]]>
+        <where>
+               AND msct_uid = #{recordId}
+        </where>
+    </select>
+
+    <select id="getAllRecords" resultMap="CategoriesMap">
+        <![CDATA[
+            SELECT *
+              FROM (
+        ]]>
+        <include refid="sqlGetAllRecords"/>
+        <![CDATA[
+                   ) AS records
+          ORDER BY msct_uid
+        ]]>
+        <if test="limit != null">
+             LIMIT ${limit} OFFSET ${offset}
+        </if>
+    </select>
+
+    <select id="getCountAllRecords" resultType="int">
+        <![CDATA[
+            SELECT COUNT(DISTINCT msct_uid)
+              FROM (
+        ]]>
+        <include refid="sqlGetAllRecords"/>
+        <![CDATA[
+                   ) AS records
+        ]]>
+    </select>
+
+    <sql id="sqlGetAllRecords">
+        <![CDATA[
+            SELECT *
+              FROM msct_category
+        ]]>
+        <where>
+            <if test="recordStatus != null">
+               AND msct_status = #{recordStatus}
+            </if>
+            <if test="recordName != null">
+               AND msct_name LIKE '%' || #{recordName} || '%'
+            </if>
+        </where>
+    </sql>
+
+    <insert id="saveRecord" useGeneratedKeys="true" keyProperty="uid">
+        <![CDATA[
+            INSERT INTO msct_category
+                       (msct_uid,
+                        msct_status,
+                        msct_name)
+                VALUES (#{category.uid},
+                        #{category.status},
+                        #{category.name});
+        ]]>
+    </insert>
+
+    <update id="updateRecord">
+        <![CDATA[
+          UPDATE msct_category
+        ]]>
+        <set>
+            <if test="category.status != null">
+                 msct_status = #{category.status},
+            </if>
+            <if test="category.name != null">
+                 msct_name = #{category.name},
+            </if>
+                 msct_last_update_date = CURRENT_TIMESTAMP
+        </set>
+        <where>
+                 msct_uid = #{category.uid}
+        </where>
+    </update>
+
+    <delete id="deleteRecord">
+        <![CDATA[
+         UPDATE msct_category
+        ]]>
+        <set>
+                msct_status = 0,
+                msct_last_update_date = CURRENT_TIMESTAMP
+        </set>
+        <where>
+                msct_uid = #{category.uid}
+        </where>
+    </delete>
+
+    <select id="getNextVal" resultType="java.lang.Long">
+        SELECT NEXTVAL('msct_seq')
+    </select>
+</mapper>
