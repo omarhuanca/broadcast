@@ -40,7 +40,7 @@ import io.umss.app.br.broadcast.util.exception.response.custom.CustomRuntimeExce
 @RequestMapping("/api/v1/classchannels")
 public class ClassChannelResource {
 
-    private static final Logger logger = LoggerFactory.getLogger(ClassChannelResource.class);
+    private final Logger logger = LoggerFactory.getLogger(ClassChannelResource.class);
 
     @Autowired
     private AEutil util;

@@ -40,7 +40,7 @@ import io.umss.app.br.broadcast.util.exception.response.custom.CustomRuntimeExce
 @RequestMapping("/api/v1/subscribers")
 public class SubscriberResource {
 
-    private static final Logger logger = LoggerFactory.getLogger(SubscriberResource.class);
+    private final Logger logger = LoggerFactory.getLogger(SubscriberResource.class);
 
     @Autowired
     private AEutil util;

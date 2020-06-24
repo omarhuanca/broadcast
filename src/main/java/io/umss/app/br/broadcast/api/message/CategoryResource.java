@@ -23,30 +23,30 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.umss.app.br.broadcast.core.message.ClassMessage;
-import io.umss.app.br.broadcast.dto.message.ClassMessageDTOV;
-import io.umss.app.br.broadcast.service.message.ClassMessageService;
+import io.umss.app.br.broadcast.core.message.Category;
+import io.umss.app.br.broadcast.dto.message.CategoryDTOV;
+import io.umss.app.br.broadcast.service.message.CategoryService;
 import io.umss.app.br.broadcast.util.AElog;
 import io.umss.app.br.broadcast.util.AEutil;
 import io.umss.app.br.broadcast.util.exception.response.custom.CustomRuntimeException;
 
 /**
- * ClassMessageResource
+ * CategoryResource
  * 
  * @author Omar Huanca
  * @since 1.0
  */
 @RestController
-@RequestMapping("/api/v1/classmessages")
-public class ClassMessageResource {
+@RequestMapping("/api/v1/categories")
+public class CategoryResource {
 
-    private final Logger logger = LoggerFactory.getLogger(ClassMessageResource.class);
+    private final Logger logger = LoggerFactory.getLogger(CategoryResource.class);
 
     @Autowired
     private AEutil util;
 
     @Autowired
-    private ClassMessageService service;
+    private CategoryService service;
 
     @GetMapping
     public ResponseEntity<Object> findAllObjects(@Nullable Integer status, @Nullable String name,
@@ -54,7 +54,7 @@ public class ClassMessageResource {
             @RequestParam(value = "page", defaultValue = "0") Integer page, HttpServletRequest request) {
 
         Integer totalRecords;
-        List<ClassMessage> objectList;
+        List<Category> objectList;
         HttpHeaders responseHeaders = new HttpHeaders();
         requestLog(request);
 
@@ -69,7 +69,7 @@ public class ClassMessageResource {
     @GetMapping("/{id}")
     public ResponseEntity<Object> findById(@PathVariable("id") Long id, HttpServletRequest request) {
 
-        ClassMessage object;
+        Category object;
         HttpHeaders responseHeaders = new HttpHeaders();
         requestLog(request);
 
@@ -88,10 +88,9 @@ public class ClassMessageResource {
     }
 
     @PostMapping
-    public ResponseEntity<Object> saveObject(@Valid @RequestBody ClassMessageDTOV objectDTOV,
-            HttpServletRequest request) {
+    public ResponseEntity<Object> saveObject(@Valid @RequestBody CategoryDTOV objectDTOV, HttpServletRequest request) {
 
-        ClassMessage object = new ClassMessage();
+        Category object = new Category();
         HttpHeaders responseHeaders = new HttpHeaders();
         requestLog(request);
 
@@ -108,10 +107,10 @@ public class ClassMessageResource {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Object> updateObject(@Valid @RequestBody ClassMessageDTOV objectDTOV,
-            @PathVariable("id") Long id, HttpServletRequest request) {
+    public ResponseEntity<Object> updateObject(@Valid @RequestBody CategoryDTOV objectDTOV, @PathVariable("id") Long id,
+            HttpServletRequest request) {
 
-        ClassMessage object = new ClassMessage();
+        Category object = new Category();
         HttpHeaders responseHeaders = new HttpHeaders();
         requestLog(request);
 
@@ -134,10 +133,10 @@ public class ClassMessageResource {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Object> deleteObject(@Valid @RequestBody ClassMessageDTOV objectDTOV,
+    public ResponseEntity<Object> deleteObject(@Valid @RequestBody CategoryDTOV objectDTOV,
             @PathVariable("id") Long id, HttpServletRequest request) {
 
-        ClassMessage object = new ClassMessage();
+        Category object = new Category();
         HttpHeaders responseHeaders = new HttpHeaders();
         requestLog(request);
 
