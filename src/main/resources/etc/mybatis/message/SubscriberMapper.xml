@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.umss.app.br.broadcast.dao.message.subscriber.MSubscriberMapper">
+    <!--  Result Maps -->
+    <resultMap id="SubscribersMap" type="io.umss.app.br.broadcast.core.message.Subscriber">
+        <id     column="mssb_uid"              property="uid"            javaType="long"/>
+        <result column="mssb_status"           property="status"         javaType="int"/>
+        <result column="mssb_first_name"       property="firstName"      javaType="string"/>
+        <result column="mssb_create_date"      property="createDate"     javaType="java.sql.Timestamp"/>
+        <result column="mssb_last_update_date" property="lastUpdateDate" javaType="java.sql.Timestamp"/>
+    </resultMap>
+
+    <resultMap id="SimpleSubscriberMap" type="io.umss.app.br.broadcast.core.message.Subscriber">
+        <id     column="mssb_uid"              property="uid"            javaType="long"/>
+        <result column="mssb_status"           property="status"         javaType="int"/>
+        <result column="mssb_first_name"       property="firstName"      javaType="string"/>
+        <result column="mssb_last_name"        property="lastName"       javaType="string"/>
+        <result column="mssb_email"            property="email"          javaType="string"/>
+        <result column="mssb_cellphone"        property="cellphone"      javaType="string"/>
+        <result column="mssb_create_date"      property="createDate"     javaType="java.sql.Timestamp"/>
+        <result column="mssb_last_update_date" property="lastUpdateDate" javaType="java.sql.Timestamp"/>
+    </resultMap>
+
+    <!-- Queries -->
+    <select id="getRecordById" resultMap="SimpleSubscriberMap">
+        <![CDATA[
+            SELECT *
+              FROM mssb_subscriber
+        ]]>
+        <where>
+               AND mssb_uid = #{recordId}
+        </where>
+    </select>
+
+    <select id="getAllRecords" resultMap="SubscribersMap">
+        <![CDATA[
+            SELECT *
+              FROM (
+        ]]>
+        <include refid="sqlGetAllRecords"/>
+        <![CDATA[
+                   ) AS records
+          ORDER BY mssb_uid
+        ]]>
+        <if test="limit != null">
+             LIMIT ${limit} OFFSET ${offset}
+        </if>
+    </select>
+
+    <select id="getCountAllRecords" resultType="int">
+        <![CDATA[
+            SELECT COUNT(DISTINCT mssb_uid)
+              FROM (
+        ]]>
+        <include refid="sqlGetAllRecords"/>
+        <![CDATA[
+                   ) AS records
+        ]]>
+    </select>
+
+    <sql id="sqlGetAllRecords">
+        <![CDATA[
+            SELECT *
+              FROM mssb_subscriber
+        ]]>
+        <where>
+            <if test="recordStatus != null">
+               AND mssb_status = #{recordStatus}
+            </if>
+            <if test="recordFirstName != null">
+               AND mssb_first_name LIKE '%' || #{recordFirstName} || '%'
+            </if>
+            <if test="recordLastName != null">
+               AND mssb_last_name LIKE '%' || #{recordLastName} || '%'
+            </if>
+            <if test="recordEmail != null">
+               AND mssb_email LIKE '%' || #{recordEmail} || '%'
+            </if>
+            <if test="recordCellphone != null">
+               AND mssb_cellphone LIKE '%' || #{recordCellphone} || '%'
+            </if>
+        </where>
+    </sql>
+
+    <insert id="saveRecord" useGeneratedKeys="true" keyProperty="uid">
+        <![CDATA[
+            INSERT INTO mssb_subscriber
+                       (mssb_uid,
+                        mssb_status,
+                        mssb_first_name,
+                        mssb_last_name,
+                        mssb_email,
+                        mssb_cellphone)
+                VALUES (#{subscriber.uid},
+                        #{subscriber.status},
+                        #{subscriber.firstName},
+                        #{subscriber.lastName},
+                        #{subscriber.email},
+                        #{subscriber.cellphone});
+        ]]>
+    </insert>
+
+    <update id="updateRecord">
+        <![CDATA[
+          UPDATE mssb_subscriber
+        ]]>
+        <set>
+            <if test="subscriber.status != null">
+                 mssb_status = #{subscriber.status},
+            </if>
+            <if test="subscriber.firstName != null">
+                 mssb_first_name = #{subscriber.firstName},
+            </if>
+            <if test="subscriber.lastName != null">
+                 mssb_last_name = #{subscriber.lastName},
+            </if>
+            <if test="subscriber.email != null">
+                 mssb_email = #{subscriber.email},
+            </if>
+            <if test="subscriber.cellphone != null">
+                 mssb_cellphone = #{subscriber.cellphone},
+            </if>
+                 mssb_last_update_date = CURRENT_TIMESTAMP
+        </set>
+        <where>
+                 mssb_uid = #{subscriber.uid}
+        </where>
+    </update>
+
+    <delete id="deleteRecord">
+        <![CDATA[
+         UPDATE mssb_subscriber
+        ]]>
+        <set>
+                mssb_status = 0,
+                mssb_last_update_date = CURRENT_TIMESTAMP
+        </set>
+        <where>
+                mssb_uid = #{subscriber.uid}
+        </where>
+    </delete>
+
+    <select id="getNextVal" resultType="java.lang.Long">
+        SELECT NEXTVAL('mssb_seq')
+    </select>
+</mapper>

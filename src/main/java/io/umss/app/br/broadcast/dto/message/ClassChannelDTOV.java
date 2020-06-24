@@ -2,6 +2,11 @@ package io.umss.app.br.broadcast.dto.message;
 
 import java.sql.Timestamp;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+
 import io.umss.app.br.broadcast.core.message.ClassChannel;
 
 /**
@@ -12,10 +17,15 @@ import io.umss.app.br.broadcast.core.message.ClassChannel;
  */
 public class ClassChannelDTOV {
 
+    @Min(value = 0, message = "The id cannot be less than 0.")
     private Long uid;
 
+    @Min(value = 0, message = "The state cannot be less than 0 o greather than 1.")
+    @Max(1)
     private Integer status;
 
+    @NotBlank(message = "The name is not valid.")
+    @Size(max = 80, message = "The name should not be greather than 80 characters.")
     private String name;
 
     private Timestamp createDate;
