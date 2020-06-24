@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.umss.app.br.broadcast.dao.message.classmessage.MClassMessageMapper">
+    <!--  Result Maps -->
+    <resultMap id="ClassMessagesMap" type="io.umss.app.br.broadcast.core.message.ClassMessage">
+        <id     column="mscm_uid"              property="uid"            javaType="long"/>
+        <result column="mscm_status"           property="status"         javaType="int"/>
+        <result column="mscm_name"             property="name"           javaType="string"/>
+        <result column="mscm_create_date"      property="createDate"     javaType="java.sql.Timestamp"/>
+        <result column="mscm_last_update_date" property="lastUpdateDate" javaType="java.sql.Timestamp"/>
+    </resultMap>
+
+    <resultMap id="SimpleClassMessageMap" type="io.umss.app.br.broadcast.core.message.ClassMessage">
+        <id     column="mscm_uid"              property="uid"            javaType="long"/>
+        <result column="mscm_status"           property="status"         javaType="int"/>
+        <result column="mscm_name"             property="name"           javaType="string"/>
+        <result column="mscm_create_date"      property="createDate"     javaType="java.sql.Timestamp"/>
+        <result column="mscm_last_update_date" property="lastUpdateDate" javaType="java.sql.Timestamp"/>
+    </resultMap>
+
+    <!-- Queries -->
+    <select id="getRecordById" resultMap="SimpleClassMessageMap">
+        <![CDATA[
+            SELECT *
+              FROM mscm_class_message
+        ]]>
+        <where>
+               AND mscm_uid = #{recordId}
+        </where>
+    </select>
+
+    <select id="getAllRecords" resultMap="ClassMessagesMap">
+        <![CDATA[
+            SELECT *
+              FROM (
+        ]]>
+        <include refid="sqlGetAllRecords"/>
+        <![CDATA[
+                   ) AS records
+          ORDER BY mscm_uid
+        ]]>
+        <if test="limit != null">
+             LIMIT ${limit} OFFSET ${offset}
+        </if>
+    </select>
+
+    <select id="getCountAllRecords" resultType="int">
+        <![CDATA[
+            SELECT COUNT(DISTINCT mscm_uid)
+              FROM (
+        ]]>
+        <include refid="sqlGetAllRecords"/>
+        <![CDATA[
+                   ) AS records
+        ]]>
+    </select>
+
+    <sql id="sqlGetAllRecords">
+        <![CDATA[
+            SELECT *
+              FROM mscm_class_message
+        ]]>
+        <where>
+            <if test="recordStatus != null">
+               AND mscm_status = #{recordStatus}
+            </if>
+            <if test="recordName != null">
+               AND mscm_name LIKE '%' || #{recordName} || '%'
+            </if>
+        </where>
+    </sql>
+
+    <insert id="saveRecord" useGeneratedKeys="true" keyProperty="uid">
+        <![CDATA[
+            INSERT INTO mscm_class_message
+                       (mscm_uid,
+                        mscm_status,
+                        mscm_name)
+                VALUES (#{classMessage.uid},
+                        #{classMessage.status},
+                        #{classMessage.name});
+        ]]>
+    </insert>
+
+    <update id="updateRecord">
+        <![CDATA[
+          UPDATE mscm_class_message
+        ]]>
+        <set>
+            <if test="classMessage.status != null">
+                 mscm_status = #{classMessage.status},
+            </if>
+            <if test="classMessage.name != null">
+                 mscm_name = #{classMessage.name},
+            </if>
+                 mscm_last_update_date = CURRENT_TIMESTAMP
+        </set>
+        <where>
+                 mscm_uid = #{classMessage.uid}
+        </where>
+    </update>
+
+    <delete id="deleteRecord">
+        <![CDATA[
+         UPDATE mscm_class_message
+        ]]>
+        <set>
+                mscm_status = 0,
+                mscm_last_update_date = CURRENT_TIMESTAMP
+        </set>
+        <where>
+                mscm_uid = #{classMessage.uid}
+        </where>
+    </delete>
+
+    <select id="getNextVal" resultType="java.lang.Long">
+        SELECT NEXTVAL('mscm_seq')
+    </select>
+</mapper>
