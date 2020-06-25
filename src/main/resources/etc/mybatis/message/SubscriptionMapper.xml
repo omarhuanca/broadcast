@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.umss.app.br.broadcast.dao.message.subscription.MSubscriptionMapper">
+    <!--  Result Maps -->
+    <resultMap id="SubscriptionsMap" type="io.umss.app.br.broadcast.core.message.Subscription">
+        <id     column="msss_uid"              property="uid"            javaType="long"/>
+        <result column="msss_status"           property="status"         javaType="int"/>
+        <result column="msss_create_date"      property="createDate"     javaType="java.sql.Timestamp"/>
+        <result column="msss_last_update_date" property="lastUpdateDate" javaType="java.sql.Timestamp"/>
+    </resultMap>
+
+    <resultMap id="SimpleSubscriptionMap" type="io.umss.app.br.broadcast.core.message.Subscription">
+        <id     column="msss_uid"              property="uid"            javaType="long"/>
+        <result column="msss_status"           property="status"         javaType="int"/>
+        <result column="msss_create_date"      property="createDate"     javaType="java.sql.Timestamp"/>
+        <result column="msss_last_update_date" property="lastUpdateDate" javaType="java.sql.Timestamp"/>
+
+        <association column="mscc_uid" property="classChannel" javaType="io.umss.app.br.broadcast.core.message.ClassChannel">
+            <id     property="uid"    column="mscc_uid"    javaType="long"/>
+            <result property="status" column="mscc_status" javaType="int"/>
+            <result property="name"   column="mscc_name"   javaType="string"/>
+        </association>
+
+        <association column="mssb_uid" property="subscriber" javaType="io.umss.app.br.broadcast.core.message.Subscriber">
+            <id     property="uid"       column="mssb_uid"        javaType="long"/>
+            <result property="status"    column="mssb_status"     javaType="int"/>
+            <result property="firstName" column="mssb_first_name" javaType="string"/>
+            <result property="lastName"  column="mssb_last_name"  javaType="string"/>
+        </association>
+
+        <association column="msct_uid" property="category" javaType="io.umss.app.br.broadcast.core.message.Category">
+            <id     property="uid"    column="msct_uid"    javaType="long"/>
+            <result property="status" column="msct_status" javaType="int"/>
+            <result property="name"   column="msct_name"   javaType="string"/>
+        </association>
+    </resultMap>
+
+    <!-- Queries -->
+    <select id="getRecordById" resultMap="SimpleSubscriptionMap">
+        <![CDATA[
+            SELECT *
+              FROM msss_subscription
+         LEFT JOIN mscc_class_channel
+                ON msss_mscc_uid = mscc_uid
+         LEFT JOIN mssb_subscriber
+                ON msss_mssb_uid = mssb_uid
+         LEFT JOIN msct_category
+                ON msss_msct_uid = msct_uid
+        ]]>
+        <where>
+               AND msss_uid = #{recordId}
+        </where>
+    </select>
+
+    <select id="getAllRecords" resultMap="SubscriptionsMap">
+        <![CDATA[
+            SELECT *
+              FROM (
+        ]]>
+        <include refid="sqlGetAllRecords"/>
+        <![CDATA[
+                   ) AS records
+          ORDER BY msss_uid
+        ]]>
+        <if test="limit != null">
+             LIMIT ${limit} OFFSET ${offset}
+        </if>
+    </select>
+
+    <select id="getCountAllRecords" resultType="int">
+        <![CDATA[
+            SELECT COUNT(DISTINCT msss_uid)
+              FROM (
+        ]]>
+        <include refid="sqlGetAllRecords"/>
+        <![CDATA[
+                   ) AS records
+        ]]>
+    </select>
+
+    <sql id="sqlGetAllRecords">
+        <![CDATA[
+            SELECT *
+              FROM msss_subscription
+        ]]>
+        <where>
+            <if test="recordStatus != null">
+               AND msss_status = #{recordStatus}
+            </if>
+            <if test="classChannelId != null">
+               AND msss_mscc_uid = #{classChannelId}
+            </if>
+            <if test="subscriberId != null">
+               AND msss_mssb_uid = #{subscriberId}
+            </if>
+            <if test="categoryId != null">
+               AND msss_msct_uid = #{categoryId}
+            </if>
+        </where>
+    </sql>
+
+    <insert id="saveRecord" useGeneratedKeys="true" keyProperty="uid">
+        <![CDATA[
+            INSERT INTO msss_subscription
+                       (msss_uid,
+                        msss_status,
+                        msss_mscc_uid,
+                        msss_mssb_uid,
+                        msss_msct_uid)
+                VALUES (#{subscription.uid},
+                        #{subscription.status},
+                        #{subscription.classChannel.uid},
+                        #{subscription.subscriber.uid},
+                        #{subscription.category.uid});
+        ]]>
+    </insert>
+
+    <update id="updateRecord">
+        <![CDATA[
+          UPDATE msss_subscription
+        ]]>
+        <set>
+            <if test="subscription.status != null">
+                 msss_status = #{subscription.status},
+            </if>
+            <if test="subscription.classChannel.uid != null">
+                 msss_mscc_uid = #{subscription.classChannel.uid},
+            </if>
+            <if test="subscription.subscriber.uid != null">
+                 msss_mssb_uid = #{subscription.subscriber.uid},
+            </if>
+            <if test="subscription.category.uid != null">
+                 msss_msct_uid = #{subscription.category.uid},
+            </if>
+                 msss_last_update_date = CURRENT_TIMESTAMP
+        </set>
+        <where>
+                 msss_uid = #{subscription.uid}
+        </where>
+    </update>
+
+    <delete id="deleteRecord">
+        <![CDATA[
+         UPDATE msss_subscription
+        ]]>
+        <set>
+                msss_status = 0,
+                msss_last_update_date = CURRENT_TIMESTAMP
+        </set>
+        <where>
+                msss_uid = #{subscription.uid}
+        </where>
+    </delete>
+
+    <select id="getNextVal" resultType="java.lang.Long">
+        SELECT NEXTVAL('msss_seq')
+    </select>
+</mapper>
