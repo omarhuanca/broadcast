@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.umss.app.br.broadcast.dao.message.message.MMessageMapper">
+    <!--  Result Maps -->
+    <resultMap id="MessagesMap" type="io.umss.app.br.broadcast.core.message.Message">
+        <id     column="msms_uid"              property="uid"            javaType="long"/>
+        <result column="msms_status"           property="status"         javaType="int"/>
+        <result column="msms_title"            property="title"          javaType="string"/>
+        <result column="msms_body"             property="body"           javaType="string"/>
+        <result column="msms_create_date"      property="createDate"     javaType="java.sql.Timestamp"/>
+        <result column="msms_last_update_date" property="lastUpdateDate" javaType="java.sql.Timestamp"/>
+    </resultMap>
+
+    <resultMap id="SimpleMessageMap" type="io.umss.app.br.broadcast.core.message.Message">
+        <id     column="msms_uid"              property="uid"            javaType="long"/>
+        <result column="msms_status"           property="status"         javaType="int"/>
+        <result column="msms_title"            property="title"          javaType="string"/>
+        <result column="msms_body"             property="body"           javaType="string"/>
+        <result column="msms_create_date"      property="createDate"     javaType="java.sql.Timestamp"/>
+        <result column="msms_last_update_date" property="lastUpdateDate" javaType="java.sql.Timestamp"/>
+
+        <association column="mscm_uid" property="classMessage" javaType="io.umss.app.br.broadcast.core.message.ClassMessage">
+            <id     property="uid"    column="mscm_uid"    javaType="long"/>
+            <result property="status" column="mscm_status" javaType="int"/>
+            <result property="name"   column="mscm_name"   javaType="string"/>
+        </association>
+    </resultMap>
+
+    <!-- Queries -->
+    <select id="getRecordById" resultMap="SimpleMessageMap">
+        <![CDATA[
+            SELECT *
+              FROM msms_message
+         LEFT JOIN mscm_class_message
+                ON msms_mscm_uid = mscm_uid
+        ]]>
+        <where>
+               AND msms_uid = #{recordId}
+        </where>
+    </select>
+
+    <select id="getAllRecords" resultMap="MessagesMap">
+        <![CDATA[
+            SELECT *
+              FROM (
+        ]]>
+        <include refid="sqlGetAllRecords"/>
+        <![CDATA[
+                   ) AS records
+          ORDER BY msms_uid
+        ]]>
+        <if test="limit != null">
+             LIMIT ${limit} OFFSET ${offset}
+        </if>
+    </select>
+
+    <select id="getCountAllRecords" resultType="int">
+        <![CDATA[
+            SELECT COUNT(DISTINCT msms_uid)
+              FROM (
+        ]]>
+        <include refid="sqlGetAllRecords"/>
+        <![CDATA[
+                   ) AS records
+        ]]>
+    </select>
+
+    <sql id="sqlGetAllRecords">
+        <![CDATA[
+            SELECT *
+              FROM msms_message
+        ]]>
+        <where>
+            <if test="recordStatus != null">
+               AND msms_status = #{recordStatus}
+            </if>
+            <if test="recordTitle != null">
+               AND msms_title LIKE '%' || #{recordTitle} || '%'
+            </if>
+            <if test="recordBody != null">
+               AND msms_body LIKE '%' || #{recordBody} || '%'
+            </if>
+            <if test="classMessageId != null">
+               AND msms_mscm_uid = #{classMessageId}
+            </if>
+        </where>
+    </sql>
+
+    <insert id="saveRecord" useGeneratedKeys="true" keyProperty="uid">
+        <![CDATA[
+            INSERT INTO msms_message
+                       (msms_uid,
+                        msms_status,
+                        msms_title,
+                        msms_body,
+                        msms_mscm_uid)
+                VALUES (#{message.uid},
+                        #{message.status},
+                        #{message.title},
+                        #{message.body},
+                        #{message.classMessage.uid});
+        ]]>
+    </insert>
+
+    <update id="updateRecord">
+        <![CDATA[
+          UPDATE msms_message
+        ]]>
+        <set>
+            <if test="message.status != null">
+                 msms_status = #{message.status},
+            </if>
+            <if test="message.title != null">
+                 msms_title = #{message.title},
+            </if>
+            <if test="message.body != null">
+                 msms_body = #{message.body},
+            </if>
+            <if test="message.classMessage.uid != null">
+                 msms_mscm_uid = #{message.classMessage.uid},
+            </if>
+                 msms_last_update_date = CURRENT_TIMESTAMP
+        </set>
+        <where>
+                 msms_uid = #{message.uid}
+        </where>
+    </update>
+
+    <delete id="deleteRecord">
+        <![CDATA[
+         UPDATE msms_message
+        ]]>
+        <set>
+                msms_status = 0,
+                msms_last_update_date = CURRENT_TIMESTAMP
+        </set>
+        <where>
+                msms_uid = #{message.uid}
+        </where>
+    </delete>
+
+    <select id="getNextVal" resultType="java.lang.Long">
+        SELECT NEXTVAL('msms_seq')
+    </select>
+</mapper>
