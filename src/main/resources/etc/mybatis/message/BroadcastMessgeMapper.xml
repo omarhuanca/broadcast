@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.umss.app.br.broadcast.dao.message.broadcastmessage.MBroadcastMessageMapper">
+    <!--  Result Maps -->
+    <resultMap id="BroadcastMessagesMap" type="io.umss.app.br.broadcast.core.message.BroadcastMessage">
+        <id     column="msbm_uid"              property="uid"            javaType="long"/>
+        <result column="msbm_status"           property="status"         javaType="int"/>
+        <result column="msbm_create_date"      property="createDate"     javaType="java.sql.Timestamp"/>
+        <result column="msbm_last_update_date" property="lastUpdateDate" javaType="java.sql.Timestamp"/>
+    </resultMap>
+
+    <resultMap id="SimpleBroadcastMessageMap" type="io.umss.app.br.broadcast.core.message.BroadcastMessage">
+        <id     column="msbm_uid"              property="uid"            javaType="long"/>
+        <result column="msbm_status"           property="status"         javaType="int"/>
+        <result column="msbm_create_date"      property="createDate"     javaType="java.sql.Timestamp"/>
+        <result column="msbm_last_update_date" property="lastUpdateDate" javaType="java.sql.Timestamp"/>
+
+        <association column="msct_uid" property="category" javaType="io.umss.app.br.broadcast.core.message.Category">
+            <id     property="uid"    column="msct_uid"    javaType="long"/>
+            <result property="status" column="msct_status" javaType="int"/>
+            <result property="name"   column="msct_name"   javaType="string"/>
+        </association>
+
+        <association column="msms_uid" property="message" javaType="io.umss.app.br.broadcast.core.message.Message">
+            <id     property="uid"    column="msms_uid"    javaType="long"/>
+            <result property="status" column="msms_status" javaType="int"/>
+            <result property="title"  column="msms_title"  javaType="string"/>
+        </association>
+    </resultMap>
+
+    <!-- Queries -->
+    <select id="getRecordById" resultMap="SimpleBroadcastMessageMap">
+        <![CDATA[
+            SELECT *
+              FROM msbm_broadcast_message
+         LEFT JOIN msct_category
+                ON msbm_msct_uid = msct_uid
+         LEFT JOIN msms_message
+                ON msbm_msms_uid = msms_uid
+        ]]>
+        <where>
+               AND msbm_uid = #{recordId}
+        </where>
+    </select>
+
+    <select id="getAllRecords" resultMap="BroadcastMessagesMap">
+        <![CDATA[
+            SELECT *
+              FROM (
+        ]]>
+        <include refid="sqlGetAllRecords"/>
+        <![CDATA[
+                   ) AS records
+          ORDER BY msbm_uid
+        ]]>
+        <if test="limit != null">
+             LIMIT ${limit} OFFSET ${offset}
+        </if>
+    </select>
+
+    <select id="getCountAllRecords" resultType="int">
+        <![CDATA[
+            SELECT COUNT(DISTINCT msbm_uid)
+              FROM (
+        ]]>
+        <include refid="sqlGetAllRecords"/>
+        <![CDATA[
+                   ) AS records
+        ]]>
+    </select>
+
+    <sql id="sqlGetAllRecords">
+        <![CDATA[
+            SELECT *
+              FROM msbm_broadcast_message
+        ]]>
+        <where>
+            <if test="recordStatus != null">
+               AND msbm_status = #{recordStatus}
+            </if>
+            <if test="categoryId != null">
+               AND msbm_msct_uid = #{categoryId}
+            </if>
+            <if test="messageId != null">
+               AND msbm_msms_uid = #{messageId}
+            </if>
+        </where>
+    </sql>
+
+    <insert id="saveRecord" useGeneratedKeys="true" keyProperty="uid">
+        <![CDATA[
+            INSERT INTO msbm_broadcast_message
+                       (msbm_uid,
+                        msbm_status,
+                        msbm_msct_uid,
+                        msbm_msms_uid)
+                VALUES (#{broadcastMessage.uid},
+                        #{broadcastMessage.status},
+                        #{broadcastMessage.category.uid},
+                        #{broadcastMessage.message.uid});
+        ]]>
+    </insert>
+
+    <update id="updateRecord">
+        <![CDATA[
+          UPDATE msbm_broadcast_message
+        ]]>
+        <set>
+            <if test="broadcastMessage.status != null">
+                 msbm_status = #{broadcastMessage.status},
+            </if>
+            <if test="broadcastMessage.category.uid != null">
+                 msbm_msct_uid = #{broadcastMessage.category.uid},
+            </if>
+            <if test="broadcastMessage.message.uid != null">
+                 msbm_msms_uid = #{broadcastMessage.message.uid},
+            </if>
+                 msbm_last_update_date = CURRENT_TIMESTAMP
+        </set>
+        <where>
+                 msbm_uid = #{broadcastMessage.uid}
+        </where>
+    </update>
+
+    <delete id="deleteRecord">
+        <![CDATA[
+         UPDATE msbm_broadcast_message
+        ]]>
+        <set>
+                msbm_status = 0,
+                msbm_last_update_date = CURRENT_TIMESTAMP
+        </set>
+        <where>
+                msbm_uid = #{broadcastMessage.uid}
+        </where>
+    </delete>
+
+    <select id="getNextVal" resultType="java.lang.Long">
+        SELECT NEXTVAL('msbm_seq')
+    </select>
+</mapper>
