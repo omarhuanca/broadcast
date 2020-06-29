@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.telegram.telegrambots.ApiContextInitializer;
 
 import io.umss.app.br.broadcast.util.AElog;
 import io.umss.app.br.broadcast.util.AEutil;
@@ -27,6 +28,7 @@ public class BroadcastApplication implements CommandLineRunner {
     private AEutil util;
 
     public static void main(String[] args) {
+        ApiContextInitializer.init();
         // Corre antes de todo
         // ....
         SpringApplication.run(BroadcastApplication.class, args);

@@ -29,12 +29,6 @@ import io.umss.app.br.broadcast.dao.message.subscriber.RSubscriberRepository;
 @PropertySource(value = "classpath:application.properties", ignoreResourceNotFound = true)
 public class TwilioService {
 
-    @Autowired
-    RMessageRepository messageRepository;
-
-    @Autowired
-    RSubscriberRepository subscriberRepository;
-
     @Value("${twilio.sms.account.sid}")
     private String accountSid;
 
@@ -43,6 +37,12 @@ public class TwilioService {
 
     @Value("${twilio.sms.twilio.phone.number}")
     private String twilioPhoneNumber;
+
+    @Autowired
+    RMessageRepository messageRepository;
+
+    @Autowired
+    RSubscriberRepository subscriberRepository;
 
     public void sendSMS(List<BroadcastMessage> listBroadcastMessage, List<Subscription> listSubscription) {
         if (!StringUtils.isBlank(accountSid) && !StringUtils.isBlank(authToken)
