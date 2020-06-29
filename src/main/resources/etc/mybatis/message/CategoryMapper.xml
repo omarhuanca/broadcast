@@ -17,6 +17,41 @@
         <result column="msct_name"             property="name"           javaType="string"/>
         <result column="msct_create_date"      property="createDate"     javaType="java.sql.Timestamp"/>
         <result column="msct_last_update_date" property="lastUpdateDate" javaType="java.sql.Timestamp"/>
+
+        <collection property="listSubscription" ofType="io.umss.app.br.broadcast.core.message.Subscription" javaType="java.util.List">
+            <id column="mscc_uid" javaType="long"/>
+            <id column="mssb_uid" javaType="long"/> 
+
+            <result property="uid"        column="msss_uid"         javaType="long"/>
+            <result property="status"     column="msss_status"      javaType="int"/>
+            <result property="createDate" column="msss_create_date" javaType="java.sql.Timestamp"/>
+
+            <association column="mscc_uid" property="classChannel" javaType="io.umss.app.br.broadcast.core.message.ClassChannel">
+                <id     column="mscc_uid"    property="uid"    javaType="long"/>
+                <result column="mscc_status" property="status" javaType="int"/>
+                <result column="mscc_name"   property="name"   javaType="string"/>
+            </association>
+
+            <association column="mssb_uid" property="subscriber" javaType="io.umss.app.br.broadcast.core.message.Subscriber">
+                <id     column="mssb_uid"       property="uid"       javaType="long"/>
+                <result column="mssb_status"    property="status"    javaType="int"/>
+                <result column="mssb_cellphone" property="cellphone" javaType="string"/>
+            </association>
+        </collection>
+
+        <collection property="listBroadcastMessage" ofType="io.umss.app.br.broadcast.core.message.BroadcastMessage" javaType="java.util.List">
+            <id column="msms_uid" javaType="long"/>
+
+            <result property="uid"        column="msbm_uid"         javaType="long"/>
+            <result property="status"     column="msbm_status"      javaType="int"/>
+            <result property="createDate" column="msbm_create_date" javaType="java.sql.Timestamp"/>
+
+            <association column="msms_uid" property="message" javaType="io.umss.app.br.broadcast.core.message.Message">
+                <id     column="msms_uid"    property="uid"    javaType="long"/>
+                <result column="msms_status" property="status" javaType="int"/>
+                <result column="msms_title"  property="title"  javaType="string"/>
+            </association>
+        </collection>
     </resultMap>
 
     <!-- Queries -->
@@ -24,6 +59,16 @@
         <![CDATA[
             SELECT *
               FROM msct_category
+         LEFT JOIN msss_subscription
+                ON msct_uid = msss_msct_uid
+         LEFT JOIN mscc_class_channel
+                ON msss_mscc_uid = mscc_uid
+         LEFT JOIN mssb_subscriber
+                ON msss_mssb_uid = mssb_uid
+         LEFT JOIN msbm_broadcast_message
+                ON msct_uid = msbm_msct_uid
+         LEFT JOIN msms_message
+                ON msbm_msms_uid = msms_uid
         ]]>
         <where>
                AND msct_uid = #{recordId}

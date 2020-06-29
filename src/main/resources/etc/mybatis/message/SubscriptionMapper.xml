@@ -8,6 +8,11 @@
         <result column="msss_status"           property="status"         javaType="int"/>
         <result column="msss_create_date"      property="createDate"     javaType="java.sql.Timestamp"/>
         <result column="msss_last_update_date" property="lastUpdateDate" javaType="java.sql.Timestamp"/>
+
+        <association column="mssb_uid" property="subscriber" javaType="io.umss.app.br.broadcast.core.message.Subscriber">
+            <id     property="uid"       column="mssb_uid"        javaType="long"/>
+            <result property="status"    column="mssb_status"     javaType="int"/>
+        </association>
     </resultMap>
 
     <resultMap id="SimpleSubscriptionMap" type="io.umss.app.br.broadcast.core.message.Subscription">
@@ -83,6 +88,8 @@
         <![CDATA[
             SELECT *
               FROM msss_subscription
+         LEFT JOIN mssb_subscriber
+                ON msss_mssb_uid = mssb_uid
         ]]>
         <where>
             <if test="recordStatus != null">

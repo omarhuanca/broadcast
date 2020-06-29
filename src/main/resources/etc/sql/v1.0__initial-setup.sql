@@ -254,3 +254,41 @@ ALTER TABLE msbm_broadcast_message
   ADD CONSTRAINT pk_msbm_uid      PRIMARY KEY (msbm_uid),
   ADD CONSTRAINT fk_msbm_msct_uid FOREIGN KEY (msbm_msct_uid) REFERENCES msct_category(msct_uid) ON UPDATE CASCADE ON DELETE CASCADE,
   ADD CONSTRAINT fk_msbm_msms_uid FOREIGN KEY (msbm_msms_uid) REFERENCES msms_message(msms_uid) ON UPDATE CASCADE ON DELETE CASCADE;
+  
+/* **********************************************
+ * REFERENCE DATA                               *
+ ************************************************/
+INSERT INTO mscc_class_channel(mscc_uid, mscc_status, mscc_name)
+  VALUES (1, 1, 'telegram'),
+         (2, 1, 'sms'),
+         (3, 1, 'email');
+
+INSERT INTO mscm_class_message(mscm_uid, mscm_status, mscm_name)
+  VALUES (1, 1, 'general'),
+         (2, 1, 'administrativo'),
+         (3, 1, 'docente');
+
+INSERT INTO msms_message(msms_uid, msms_mscm_uid, msms_status, msms_title, msms_body)
+  VALUES (1, 2, 1, 'Recordatorio Nº 6/2019', 'Se recuerda a todo el personal el revisar sus mensajes'),
+         (2, 3, 1, 'Circular Nº 9/2019', 'Estimados docentes de la Facultad: Adjunta a la presente se envía la circular Nº 9/2019 para su conocimiento y complimiento.');
+
+INSERT INTO msct_category(msct_uid, msct_status, msct_name)
+  VALUES (1, 1, 'Consejo de Carrera'),
+         (2, 1, 'Consejo Facultativo'),
+         (3, 1, 'Consejo Universitario'),
+         (4, 1, 'Directores de Carrera y Coordinadores'),
+         (5, 1, 'Docentes a dedicación exclusiva'),
+         (6, 1, 'Coordinadores académicos');
+
+INSERT INTO msbm_broadcast_message(msbm_uid, msbm_msct_uid, msbm_msms_uid, msbm_status)
+  VALUES (1, 1, 1, 1),
+         (2, 2, 2, 1);
+
+INSERT INTO mssb_subscriber(mssb_uid, mssb_status, mssb_first_name, mssb_last_name, mssb_email, mssb_cellphone)
+  VALUES (1, 1, 'Juan Omar', 'Huanca Balboa', 'omar.huanca.balboa@gmail.com', '+59171476576'),
+         (2, 1, 'Omar', 'Huanca', 'oma378501@gmail.com', '+59168043130'),
+         (3, 1, 'Juan', 'Balboa', 'oma378501@yahoo.com', '+59161592367');
+
+INSERT INTO msss_subscription(msss_uid, msss_mscc_uid, msss_mssb_uid, msss_msct_uid, msss_status)
+  VALUES (1, 2, 1, 1, 1),
+         (2, 2, 2, 1, 1);

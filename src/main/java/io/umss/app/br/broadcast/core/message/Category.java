@@ -1,6 +1,7 @@
 package io.umss.app.br.broadcast.core.message;
 
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -20,6 +21,10 @@ public class Category {
     private Timestamp createDate;
 
     private Timestamp lastUpdateDate;
+
+    private List<Subscription> listSubscription;
+
+    private List<BroadcastMessage> listBroadcastMessage;
 
     // Getters & Setters
     public Long getUid() {
@@ -60,6 +65,22 @@ public class Category {
 
     public void setLastUpdateDate(Timestamp lastUpdateDate) {
         this.lastUpdateDate = lastUpdateDate;
+    }
+
+    public List<Subscription> getListSubscription() {
+        return listSubscription;
+    }
+
+    public void setListSubscription(List<Subscription> listSubscription) {
+        this.listSubscription = listSubscription;
+    }
+
+    public List<BroadcastMessage> getListBroadcastMessage() {
+        return listBroadcastMessage;
+    }
+
+    public void setListBroadcastMessage(List<BroadcastMessage> listBroadcastMessage) {
+        this.listBroadcastMessage = listBroadcastMessage;
     }
 
     @Override
