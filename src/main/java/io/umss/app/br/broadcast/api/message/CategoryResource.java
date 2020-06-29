@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.umss.app.br.broadcast.core.message.Category;
+import io.umss.app.br.broadcast.core.message.Subscription;
 import io.umss.app.br.broadcast.dto.message.CategoryDTOV;
 import io.umss.app.br.broadcast.service.message.CategoryService;
 import io.umss.app.br.broadcast.util.AElog;
@@ -133,8 +134,8 @@ public class CategoryResource {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Object> deleteObject(@Valid @RequestBody CategoryDTOV objectDTOV,
-            @PathVariable("id") Long id, HttpServletRequest request) {
+    public ResponseEntity<Object> deleteObject(@Valid @RequestBody CategoryDTOV objectDTOV, @PathVariable("id") Long id,
+            HttpServletRequest request) {
 
         Category object = new Category();
         HttpHeaders responseHeaders = new HttpHeaders();
@@ -156,6 +157,27 @@ public class CategoryResource {
 
         responseHeaders.set("Custom-Message", "HTTP/1.1 200 OK");
         return new ResponseEntity<Object>(responseHeaders, HttpStatus.OK);
+    }
+
+    @PostMapping("/sendMessageSMS/{id}")
+    public ResponseEntity<Object> sendMessageSMS(@PathVariable("id") Long id, HttpServletRequest request) {
+
+        List<Subscription> object;
+        HttpHeaders responseHeaders = new HttpHeaders();
+        requestLog(request);
+
+        if (null == id) {
+            throw new CustomRuntimeException(HttpStatus.BAD_REQUEST, 400, "Wrong request", "There is a to the param.");
+        } else {
+            object = service.sendMessageSMS(Optional.ofNullable(id));
+            if (null == object) {
+                throw new CustomRuntimeException(HttpStatus.NOT_FOUND, 404, "Not found",
+                        "There isn't records to the param");
+            }
+        }
+
+        responseHeaders.set("Custom-Message", "HTTP/1.1 200 OK");
+        return new ResponseEntity<Object>(object, responseHeaders, HttpStatus.OK);
     }
 
     private synchronized void requestLog(HttpServletRequest request) {

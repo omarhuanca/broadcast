@@ -8,6 +8,11 @@
         <result column="msbm_status"           property="status"         javaType="int"/>
         <result column="msbm_create_date"      property="createDate"     javaType="java.sql.Timestamp"/>
         <result column="msbm_last_update_date" property="lastUpdateDate" javaType="java.sql.Timestamp"/>
+
+        <association column="msms_uid" property="message" javaType="io.umss.app.br.broadcast.core.message.Message">
+            <id     property="uid"    column="msms_uid"    javaType="long"/>
+            <result property="status" column="msms_status" javaType="int"/>
+        </association>
     </resultMap>
 
     <resultMap id="SimpleBroadcastMessageMap" type="io.umss.app.br.broadcast.core.message.BroadcastMessage">
@@ -74,6 +79,8 @@
         <![CDATA[
             SELECT *
               FROM msbm_broadcast_message
+         LEFT JOIN msms_message
+                ON msbm_msms_uid = msms_uid
         ]]>
         <where>
             <if test="recordStatus != null">
