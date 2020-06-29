@@ -76,7 +76,7 @@ public class CategoryService {
                 Optional.of(ClassStatus.ENABLE.getCode()), Optional.of(ClassChannelEnum.SMS.getCode()),
                 Pagination.DEFAULT_PAGE.getCode(), Pagination.DEFAULT_PAGE.getCode());
         ClassChannel classChannel = listClassChannel.stream()
-                .filter(item -> ClassChannelEnum.SMS.getCode().equals(item.getName())).findAny().orElse(null);
+                .filter(item -> ClassChannelEnum.SMS.getCode().equalsIgnoreCase(item.getName())).findAny().orElse(null);
 
         if (null != classChannel) {
             listSubscription = subscriptionRepository.getAllObjects(

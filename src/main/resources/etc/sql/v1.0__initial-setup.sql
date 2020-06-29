@@ -270,7 +270,7 @@ INSERT INTO mscm_class_message(mscm_uid, mscm_status, mscm_name)
 
 INSERT INTO msms_message(msms_uid, msms_mscm_uid, msms_status, msms_title, msms_body)
   VALUES (1, 2, 1, 'Recordatorio Nº 6/2019', 'Se recuerda a todo el personal el revisar sus mensajes'),
-         (2, 3, 1, 'Circular Nº 9/2019', 'Estimados docentes de la Facultad: Adjunta a la presente se envía la circular Nº 9/2019 para su conocimiento y complimiento.');
+         (2, 3, 1, 'Circular Nº 9/2019', 'Estimados docentes de la Facultad: Adjunta a la presente se envía la circular Nº 9/2019 para su conocimiento y cumplimiento.');
 
 INSERT INTO msct_category(msct_uid, msct_status, msct_name)
   VALUES (1, 1, 'Consejo de Carrera'),
