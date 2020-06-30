@@ -180,6 +180,27 @@ public class CategoryResource {
         return new ResponseEntity<Object>(object, responseHeaders, HttpStatus.OK);
     }
 
+    @GetMapping("/sendMessageMail/{id}")
+    public ResponseEntity<Object> sendMessageMail(@PathVariable("id") Long id, HttpServletRequest request) {
+
+        List<Subscription> object;
+        HttpHeaders responseHeaders = new HttpHeaders();
+        requestLog(request);
+
+        if (null == id) {
+            throw new CustomRuntimeException(HttpStatus.BAD_REQUEST, 400, "Wrong request", "There is a to the param.");
+        } else {
+            object = service.sendMessageMail(Optional.ofNullable(id));
+            if (null == object) {
+                throw new CustomRuntimeException(HttpStatus.NOT_FOUND, 404, "Not found",
+                        "There isn't records to the param");
+            }
+        }
+
+        responseHeaders.set("Custom-Message", "HTTP/1.1 200 OK");
+        return new ResponseEntity<Object>(object, responseHeaders, HttpStatus.OK);
+    }
+
     private synchronized void requestLog(HttpServletRequest request) {
         AElog.info1(logger,
                 util.getInetAddressPort() + " <= " + request.getRemoteHost() + " {method:" + request.getMethod()

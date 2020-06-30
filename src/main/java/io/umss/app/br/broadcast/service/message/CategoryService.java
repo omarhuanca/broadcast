@@ -17,6 +17,7 @@ import io.umss.app.br.broadcast.dao.message.classchannel.RClassChannelRepository
 import io.umss.app.br.broadcast.dao.message.subscription.RSubscriptionRepository;
 import io.umss.app.br.broadcast.service.ClassChannelEnum;
 import io.umss.app.br.broadcast.service.ClassStatus;
+import io.umss.app.br.broadcast.service.EmailService;
 import io.umss.app.br.broadcast.service.Pagination;
 import io.umss.app.br.broadcast.util.exception.RepositoryException;
 
@@ -43,6 +44,9 @@ public class CategoryService {
 
     @Autowired
     TwilioService twilioService;
+
+    @Autowired
+    EmailService emailService;
 
     public Category getObjectById(Optional<Long> id) throws RepositoryException {
         return repository.getObjectById(id);
@@ -74,20 +78,46 @@ public class CategoryService {
 
         List<ClassChannel> listClassChannel = classChannelRepository.getAllObjects(
                 Optional.of(ClassStatus.ENABLE.getCode()), Optional.of(ClassChannelEnum.SMS.getCode()),
-                Pagination.DEFAULT_PAGE.getCode(), Pagination.DEFAULT_PAGE.getCode());
+                Pagination.DEFAULT_PAGE_SIZE.getCode(), Pagination.DEFAULT_PAGE.getCode());
         ClassChannel classChannel = listClassChannel.stream()
                 .filter(item -> ClassChannelEnum.SMS.getCode().equalsIgnoreCase(item.getName())).findAny().orElse(null);
 
         if (null != classChannel) {
-            listSubscription = subscriptionRepository.getAllObjects(
-                    Optional.of(ClassStatus.ENABLE.getCode()), Optional.of(classChannel.getUid()), Optional.empty(),
-                    categoryId, Pagination.DEFAULT_PAGE.getCode(), Pagination.DEFAULT_PAGE.getCode());
+            listSubscription = subscriptionRepository.getAllObjects(Optional.of(ClassStatus.ENABLE.getCode()),
+                    Optional.of(classChannel.getUid()), Optional.empty(), categoryId,
+                    Pagination.MAX_PAGE_SIZE.getCode(), Pagination.DEFAULT_PAGE.getCode());
 
             List<BroadcastMessage> listBroadcastMessage = broadcastMessageRepository.getAllObjects(
                     Optional.of(ClassStatus.ENABLE.getCode()), categoryId, Optional.empty(),
-                    Pagination.DEFAULT_PAGE.getCode(), Pagination.DEFAULT_PAGE.getCode());
+                    Pagination.MAX_PAGE_SIZE.getCode(), Pagination.DEFAULT_PAGE.getCode());
 
             twilioService.sendSMS(listBroadcastMessage, listSubscription);
+        }
+
+        return listSubscription;
+    }
+
+    public List<Subscription> sendMessageMail(Optional<Long> categoryId) {
+        List<Subscription> listSubscription = new ArrayList<>();
+
+        List<ClassChannel> listClassChannel = classChannelRepository.getAllObjects(
+                Optional.of(ClassStatus.ENABLE.getCode()), Optional.of(ClassChannelEnum.EMAIL.getCode()),
+                Pagination.DEFAULT_PAGE_SIZE.getCode(), Pagination.DEFAULT_PAGE.getCode());
+        ClassChannel classChannel = listClassChannel.stream()
+                .filter(item -> ClassChannelEnum.EMAIL.getCode().equalsIgnoreCase(item.getName())).findAny()
+                .orElse(null);
+
+        if (null != classChannel) {
+
+            listSubscription = subscriptionRepository.getAllObjects(Optional.of(ClassStatus.ENABLE.getCode()),
+                    Optional.ofNullable(classChannel.getUid()), Optional.empty(), categoryId,
+                    Pagination.MAX_PAGE_SIZE.getCode(), Pagination.DEFAULT_PAGE.getCode());
+
+            List<BroadcastMessage> listBroadcastMessage = broadcastMessageRepository.getAllObjects(
+                    Optional.of(ClassStatus.ENABLE.getCode()), categoryId, Optional.empty(),
+                    Pagination.MAX_PAGE_SIZE.getCode(), Pagination.DEFAULT_PAGE.getCode());
+
+            emailService.sendMail(listBroadcastMessage, listSubscription);
         }
 
         return listSubscription;
