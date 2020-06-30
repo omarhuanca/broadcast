@@ -8,7 +8,7 @@ package io.umss.app.br.broadcast.service;
  */
 public enum Pagination {
 
-    DEFAULT_PAGESIZE(10), DEFAULT_PAGE(0), MAX_PAGE_SIZE(1000);
+    DEFAULT_PAGE_SIZE(10), DEFAULT_PAGE(0), MAX_PAGE_SIZE(1000);
 
     private Integer code;
 

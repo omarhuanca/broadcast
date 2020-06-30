@@ -1,4 +1,4 @@
-package io.umss.app.br.broadcast.service.message;
+package io.umss.app.br.broadcast.service;
 
 import java.security.InvalidParameterException;
 import java.util.List;
@@ -18,9 +18,6 @@ import io.umss.app.br.broadcast.core.message.BroadcastMessage;
 import io.umss.app.br.broadcast.core.message.Message;
 import io.umss.app.br.broadcast.dao.message.broadcastmessage.RBroadcastMessageRepository;
 import io.umss.app.br.broadcast.dao.message.message.RMessageRepository;
-import io.umss.app.br.broadcast.service.ClassStatus;
-import io.umss.app.br.broadcast.service.Pagination;
-import io.umss.app.br.broadcast.service.TelegramEnum;
 
 /**
  * TelegramService
@@ -51,7 +48,7 @@ public class TelegramService extends TelegramLongPollingBot {
             Long categoryId = this.matchCommand(command);
             List<BroadcastMessage> listBroadcastMessage = broadcastMessageRepository.getAllObjects(
                     Optional.ofNullable(ClassStatus.ENABLE.getCode()), Optional.of(categoryId), Optional.empty(),
-                    Pagination.DEFAULT_PAGESIZE.getCode(), Pagination.DEFAULT_PAGE.getCode());
+                    Pagination.MAX_PAGE_SIZE.getCode(), Pagination.DEFAULT_PAGE.getCode());
 
             for (BroadcastMessage broadcastMessage : listBroadcastMessage) {
                 SendMessage sendMessage = new SendMessage();
