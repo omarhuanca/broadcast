@@ -11,10 +11,7 @@ import io.umss.app.br.broadcast.core.message.BroadcastMessage;
 import io.umss.app.br.broadcast.core.message.Category;
 import io.umss.app.br.broadcast.core.message.ClassChannel;
 import io.umss.app.br.broadcast.core.message.Subscription;
-import io.umss.app.br.broadcast.dao.message.broadcastmessage.RBroadcastMessageRepository;
 import io.umss.app.br.broadcast.dao.message.category.RCategoryRepository;
-import io.umss.app.br.broadcast.dao.message.classchannel.RClassChannelRepository;
-import io.umss.app.br.broadcast.dao.message.subscription.RSubscriptionRepository;
 import io.umss.app.br.broadcast.service.ClassChannelEnum;
 import io.umss.app.br.broadcast.service.ClassStatus;
 import io.umss.app.br.broadcast.service.EmailService;
@@ -34,13 +31,13 @@ public class CategoryService {
     RCategoryRepository repository;
 
     @Autowired
-    RSubscriptionRepository subscriptionRepository;
+    SubscriptionService subscriptionService;
 
     @Autowired
-    RBroadcastMessageRepository broadcastMessageRepository;
+    BroadcastMessageService broadcastMessageService;
 
     @Autowired
-    RClassChannelRepository classChannelRepository;
+    ClassChannelService classChannelService;
 
     @Autowired
     TwilioService twilioService;
@@ -76,18 +73,18 @@ public class CategoryService {
     public List<Subscription> sendMessageSMS(Optional<Long> categoryId) {
         List<Subscription> listSubscription = new ArrayList<>();
 
-        List<ClassChannel> listClassChannel = classChannelRepository.getAllObjects(
+        List<ClassChannel> listClassChannel = classChannelService.getAllObjects(
                 Optional.of(ClassStatus.ENABLE.getCode()), Optional.of(ClassChannelEnum.SMS.getCode()),
                 Pagination.DEFAULT_PAGE_SIZE.getCode(), Pagination.DEFAULT_PAGE.getCode());
         ClassChannel classChannel = listClassChannel.stream()
                 .filter(item -> ClassChannelEnum.SMS.getCode().equalsIgnoreCase(item.getName())).findAny().orElse(null);
 
         if (null != classChannel) {
-            listSubscription = subscriptionRepository.getAllObjects(Optional.of(ClassStatus.ENABLE.getCode()),
+            listSubscription = subscriptionService.getAllObjects(Optional.of(ClassStatus.ENABLE.getCode()),
                     Optional.of(classChannel.getUid()), Optional.empty(), categoryId,
                     Pagination.MAX_PAGE_SIZE.getCode(), Pagination.DEFAULT_PAGE.getCode());
 
-            List<BroadcastMessage> listBroadcastMessage = broadcastMessageRepository.getAllObjects(
+            List<BroadcastMessage> listBroadcastMessage = broadcastMessageService.getAllObjects(
                     Optional.of(ClassStatus.ENABLE.getCode()), categoryId, Optional.empty(),
                     Pagination.MAX_PAGE_SIZE.getCode(), Pagination.DEFAULT_PAGE.getCode());
 
@@ -100,7 +97,7 @@ public class CategoryService {
     public List<Subscription> sendMessageMail(Optional<Long> categoryId) {
         List<Subscription> listSubscription = new ArrayList<>();
 
-        List<ClassChannel> listClassChannel = classChannelRepository.getAllObjects(
+        List<ClassChannel> listClassChannel = classChannelService.getAllObjects(
                 Optional.of(ClassStatus.ENABLE.getCode()), Optional.of(ClassChannelEnum.EMAIL.getCode()),
                 Pagination.DEFAULT_PAGE_SIZE.getCode(), Pagination.DEFAULT_PAGE.getCode());
         ClassChannel classChannel = listClassChannel.stream()
@@ -109,11 +106,11 @@ public class CategoryService {
 
         if (null != classChannel) {
 
-            listSubscription = subscriptionRepository.getAllObjects(Optional.of(ClassStatus.ENABLE.getCode()),
+            listSubscription = subscriptionService.getAllObjects(Optional.of(ClassStatus.ENABLE.getCode()),
                     Optional.ofNullable(classChannel.getUid()), Optional.empty(), categoryId,
                     Pagination.MAX_PAGE_SIZE.getCode(), Pagination.DEFAULT_PAGE.getCode());
 
-            List<BroadcastMessage> listBroadcastMessage = broadcastMessageRepository.getAllObjects(
+            List<BroadcastMessage> listBroadcastMessage = broadcastMessageService.getAllObjects(
                     Optional.of(ClassStatus.ENABLE.getCode()), categoryId, Optional.empty(),
                     Pagination.MAX_PAGE_SIZE.getCode(), Pagination.DEFAULT_PAGE.getCode());
 
