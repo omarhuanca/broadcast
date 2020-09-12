@@ -88,6 +88,27 @@ public class CategoryResource {
         return new ResponseEntity<Object>(object, responseHeaders, HttpStatus.OK);
     }
 
+    @GetMapping("/sendMessageMail/{id}")
+    public ResponseEntity<Object> sendMessageMail(@PathVariable("id") Long id, HttpServletRequest request) {
+
+        List<Subscription> object;
+        HttpHeaders responseHeaders = new HttpHeaders();
+        requestLog(request);
+
+        if (null == id) {
+            throw new CustomRuntimeException(HttpStatus.BAD_REQUEST, 400, "Wrong request", "There is a to the param.");
+        } else {
+            object = service.sendMessageMail(Optional.ofNullable(id));
+            if (null == object) {
+                throw new CustomRuntimeException(HttpStatus.NOT_FOUND, 404, "Not found",
+                        "There isn't records to the param");
+            }
+        }
+
+        responseHeaders.set("Custom-Message", "HTTP/1.1 200 OK");
+        return new ResponseEntity<Object>(object, responseHeaders, HttpStatus.OK);
+    }
+
     @PostMapping
     public ResponseEntity<Object> saveObject(@Valid @RequestBody CategoryDTOV objectDTOV, HttpServletRequest request) {
 
@@ -101,6 +122,27 @@ public class CategoryResource {
         } else {
             throw new CustomRuntimeException(HttpStatus.BAD_REQUEST, 400, "Wrong Request",
                     "The object want to save is null.");
+        }
+
+        responseHeaders.set("Custom-Message", "HTTP/1.1 200 OK");
+        return new ResponseEntity<Object>(object, responseHeaders, HttpStatus.OK);
+    }
+
+    @PostMapping("/sendMessageSMS/{id}")
+    public ResponseEntity<Object> sendMessageSMS(@PathVariable("id") Long id, HttpServletRequest request) {
+
+        List<Subscription> object;
+        HttpHeaders responseHeaders = new HttpHeaders();
+        requestLog(request);
+
+        if (null == id) {
+            throw new CustomRuntimeException(HttpStatus.BAD_REQUEST, 400, "Wrong request", "There is a to the param.");
+        } else {
+            object = service.sendMessageSMS(Optional.ofNullable(id));
+            if (null == object) {
+                throw new CustomRuntimeException(HttpStatus.NOT_FOUND, 404, "Not found",
+                        "There isn't records to the param");
+            }
         }
 
         responseHeaders.set("Custom-Message", "HTTP/1.1 200 OK");
@@ -157,48 +199,6 @@ public class CategoryResource {
 
         responseHeaders.set("Custom-Message", "HTTP/1.1 200 OK");
         return new ResponseEntity<Object>(responseHeaders, HttpStatus.OK);
-    }
-
-    @PostMapping("/sendMessageSMS/{id}")
-    public ResponseEntity<Object> sendMessageSMS(@PathVariable("id") Long id, HttpServletRequest request) {
-
-        List<Subscription> object;
-        HttpHeaders responseHeaders = new HttpHeaders();
-        requestLog(request);
-
-        if (null == id) {
-            throw new CustomRuntimeException(HttpStatus.BAD_REQUEST, 400, "Wrong request", "There is a to the param.");
-        } else {
-            object = service.sendMessageSMS(Optional.ofNullable(id));
-            if (null == object) {
-                throw new CustomRuntimeException(HttpStatus.NOT_FOUND, 404, "Not found",
-                        "There isn't records to the param");
-            }
-        }
-
-        responseHeaders.set("Custom-Message", "HTTP/1.1 200 OK");
-        return new ResponseEntity<Object>(object, responseHeaders, HttpStatus.OK);
-    }
-
-    @GetMapping("/sendMessageMail/{id}")
-    public ResponseEntity<Object> sendMessageMail(@PathVariable("id") Long id, HttpServletRequest request) {
-
-        List<Subscription> object;
-        HttpHeaders responseHeaders = new HttpHeaders();
-        requestLog(request);
-
-        if (null == id) {
-            throw new CustomRuntimeException(HttpStatus.BAD_REQUEST, 400, "Wrong request", "There is a to the param.");
-        } else {
-            object = service.sendMessageMail(Optional.ofNullable(id));
-            if (null == object) {
-                throw new CustomRuntimeException(HttpStatus.NOT_FOUND, 404, "Not found",
-                        "There isn't records to the param");
-            }
-        }
-
-        responseHeaders.set("Custom-Message", "HTTP/1.1 200 OK");
-        return new ResponseEntity<Object>(object, responseHeaders, HttpStatus.OK);
     }
 
     private synchronized void requestLog(HttpServletRequest request) {

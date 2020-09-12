@@ -17,8 +17,8 @@ import io.umss.app.br.broadcast.core.message.BroadcastMessage;
 import io.umss.app.br.broadcast.core.message.Message;
 import io.umss.app.br.broadcast.core.message.Subscriber;
 import io.umss.app.br.broadcast.core.message.Subscription;
-import io.umss.app.br.broadcast.dao.message.message.RMessageRepository;
-import io.umss.app.br.broadcast.dao.message.subscriber.RSubscriberRepository;
+import io.umss.app.br.broadcast.service.message.MessageService;
+import io.umss.app.br.broadcast.service.message.SubscriberService;
 
 /**
  * EmailService
@@ -37,19 +37,19 @@ public class EmailService {
     private JavaMailSender mailSender;
 
     @Autowired
-    RMessageRepository messageRepository;
+    MessageService messageService;
 
     @Autowired
-    RSubscriberRepository subscriberRepository;
+    SubscriberService subscriberService;
 
     public void sendMail(List<BroadcastMessage> listBroadcastMessage, List<Subscription> listSubscription) {
         if (!StringUtils.isBlank(messageSubject)) {
             for (Subscription subscription : listSubscription) {
-                Subscriber subscriber = subscriberRepository
+                Subscriber subscriber = subscriberService
                         .getObjectById(Optional.ofNullable(subscription.getSubscriber().getUid()));
                 for (BroadcastMessage broadcastMessage : listBroadcastMessage) {
                     try {
-                        Message message = messageRepository
+                        Message message = messageService
                                 .getObjectById(Optional.ofNullable(broadcastMessage.getMessage().getUid()));
 
                         MimeMessage mimeMessage = mailSender.createMimeMessage();
