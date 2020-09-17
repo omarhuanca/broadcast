@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.telegram.telegrambots.ApiContextInitializer;
 
 import io.umss.app.br.broadcast.util.AElog;
@@ -20,6 +21,7 @@ import io.umss.app.br.broadcast.util.AEutil;
  * @since 1.0
  */
 @SpringBootApplication
+@EnableScheduling
 public class BroadcastApplication implements CommandLineRunner {
 
     private static final Logger logger = LoggerFactory.getLogger(BroadcastApplication.class);
