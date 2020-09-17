@@ -45,23 +45,30 @@ public class EmailService {
     public void sendMail(List<BroadcastMessage> listBroadcastMessage, List<Subscription> listSubscription) {
         if (!StringUtils.isBlank(messageSubject)) {
             for (Subscription subscription : listSubscription) {
-                Subscriber subscriber = subscriberService
-                        .getObjectById(Optional.ofNullable(subscription.getSubscriber().getUid()));
-                for (BroadcastMessage broadcastMessage : listBroadcastMessage) {
-                    try {
-                        Message message = messageService
-                                .getObjectById(Optional.ofNullable(broadcastMessage.getMessage().getUid()));
+                if (null != subscription && null != subscription.getSubscriber()
+                        && null != subscription.getSubscriber().getUid()) {
+                    Subscriber subscriber = subscriberService
+                            .getObjectById(Optional.ofNullable(subscription.getSubscriber().getUid()));
+                    for (BroadcastMessage broadcastMessage : listBroadcastMessage) {
+                        try {
+                            if (null != broadcastMessage && null != broadcastMessage.getMessage()
+                                    && null != broadcastMessage.getMessage().getUid()) {
+                                Message message = messageService
+                                        .getObjectById(Optional.ofNullable(broadcastMessage.getMessage().getUid()));
 
-                        MimeMessage mimeMessage = mailSender.createMimeMessage();
-                        MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, false, "utf-8");
+                                MimeMessage mimeMessage = mailSender.createMimeMessage();
+                                MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, false,
+                                        "utf-8");
 
-                        mimeMessageHelper.setTo(subscriber.getEmail());
-                        mimeMessageHelper.setSubject(messageSubject.toString());
-                        mimeMessage.setContent(this.buildContent(message.getBody()), "text/html");
+                                mimeMessageHelper.setTo(subscriber.getEmail());
+                                mimeMessageHelper.setSubject(messageSubject.toString());
+                                mimeMessage.setContent(this.buildContent(message.getBody()), "text/html");
 
-                        mailSender.send(mimeMessage);
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                                mailSender.send(mimeMessage);
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             }

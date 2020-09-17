@@ -23,8 +23,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.umss.app.br.broadcast.core.message.Category;
 import io.umss.app.br.broadcast.core.message.Subscription;
 import io.umss.app.br.broadcast.dto.message.SubscriptionDTOV;
+import io.umss.app.br.broadcast.service.message.CategoryService;
 import io.umss.app.br.broadcast.service.message.SubscriptionService;
 import io.umss.app.br.broadcast.util.AElog;
 import io.umss.app.br.broadcast.util.AEutil;
@@ -47,6 +49,9 @@ public class SubscriptionResource {
 
     @Autowired
     private SubscriptionService service;
+
+    @Autowired
+    private CategoryService categoryService;
 
     @GetMapping
     public ResponseEntity<Object> findAllObjects(@Nullable Integer status, @Nullable Long classChannelId,
@@ -90,6 +95,46 @@ public class SubscriptionResource {
         return new ResponseEntity<Object>(object, responseHeaders, HttpStatus.OK);
     }
 
+    @GetMapping("/sendMessageMail/{id}")
+    public ResponseEntity<Object> sendMessageMail(@PathVariable("id") Long id, HttpServletRequest request) {
+
+        List<Subscription> listSubscription;
+        Category object;
+        HttpHeaders responseHeaders = new HttpHeaders();
+        requestLog(request);
+
+        if (null == id) {
+            throw new CustomRuntimeException(HttpStatus.BAD_REQUEST, 400, "Wrong request", "There is a to the param.");
+        } else {
+            object = categoryService.getObjectById(Optional.ofNullable(id));
+            if (null == object) {
+                throw new CustomRuntimeException(HttpStatus.NOT_FOUND, 404, "Not found",
+                        "There isn't records to the param");
+            }
+            listSubscription = service.sendMessageMail(Optional.ofNullable(id));
+        }
+
+        responseHeaders.set("Custom-Message", "HTTP/1.1 200 OK");
+        return new ResponseEntity<Object>(listSubscription, responseHeaders, HttpStatus.OK);
+    }
+
+    @GetMapping("/sendAllMessageMail")
+    public ResponseEntity<Object> sendAllMessageMail(HttpServletRequest request) {
+
+        List<Subscription> object;
+        HttpHeaders responseHeaders = new HttpHeaders();
+        requestLog(request);
+
+        object = service.sendAllMessageMail();
+        if (null == object) {
+            throw new CustomRuntimeException(HttpStatus.NOT_FOUND, 404, "Not found",
+                    "There isn't records to the param");
+        }
+
+        responseHeaders.set("Custom-Message", "HTTP/1.1 200 OK");
+        return new ResponseEntity<Object>(object, responseHeaders, HttpStatus.OK);
+    }
+
     @PostMapping
     public ResponseEntity<Object> saveObject(@Valid @RequestBody SubscriptionDTOV objectDTOV,
             HttpServletRequest request) {
@@ -108,6 +153,29 @@ public class SubscriptionResource {
 
         responseHeaders.set("Custom-Message", "HTTP/1.1 200 OK");
         return new ResponseEntity<Object>(object, responseHeaders, HttpStatus.OK);
+    }
+
+    @PostMapping("/sendMessageSMS/{id}")
+    public ResponseEntity<Object> sendMessageSMS(@PathVariable("id") Long id, HttpServletRequest request) {
+
+        List<Subscription> listSubscription;
+        Category object;
+        HttpHeaders responseHeaders = new HttpHeaders();
+        requestLog(request);
+
+        if (null == id) {
+            throw new CustomRuntimeException(HttpStatus.BAD_REQUEST, 400, "Wrong request", "There is a to the param.");
+        } else {
+            object = categoryService.getObjectById(Optional.ofNullable(id));
+            if (null == object) {
+                throw new CustomRuntimeException(HttpStatus.NOT_FOUND, 404, "Not found",
+                        "There isn't records to the param");
+            }
+            listSubscription = service.sendMessageSMS(Optional.ofNullable(id));
+        }
+
+        responseHeaders.set("Custom-Message", "HTTP/1.1 200 OK");
+        return new ResponseEntity<Object>(listSubscription, responseHeaders, HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
