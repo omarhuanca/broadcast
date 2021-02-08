@@ -44,21 +44,21 @@ public class MessageService {
     }
 
     public Message save(Message object) throws RepositoryException {
-        this.verifyForeingKey(object);
+        this.verifyForeignKey(object);
 
         return repository.save(object);
     }
 
     public Message update(Message object) throws RepositoryException {
-        this.verifyForeingKey(object);
+        this.verifyForeignKey(object);
 
         return repository.update(object);
     }
 
-    private void verifyForeingKey(Message object) {
-        ClassMessage classsMessage = classMessageRepository
+    private void verifyForeignKey(Message object) {
+        ClassMessage classMessage = classMessageRepository
                 .getObjectById(Optional.ofNullable(object.getClassMessage().getUid()));
-        if (null == classsMessage || ClassStatus.DISABLE.getCode().equals(classsMessage.getStatus())) {
+        if (null == classMessage || ClassStatus.DISABLE.getCode().equals(classMessage.getStatus())) {
             throw new InvalidParameterException("The class message id does not exist or status is disable.");
         }
     }
