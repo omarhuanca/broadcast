@@ -1,0 +1,30 @@
+
+server:
+  port: 9091
+
+spring:
+  mybatis:
+    mapper-locations: "classpath*:/etc/mybatis/*/*Mapper.xml"
+    configuration-properties:
+      aggressiveLazyLoading: false
+      lazyLoadingEnabled: true
+      lazyLoadTriggerMethods: ""
+      mapUnderscoreToCamelCase: true
+
+  datasource:
+    name: postgres
+    url: jdbc:postgresql://broadcast.cwxqjwqtytxv.sa-east-1.rds.amazonaws.com:5432
+    username: postgres
+    password: Password1!
+    driver-class-name: org.postgresql.Driver
+
+spring.mail:
+  host: smtp.gmail.com
+  username: websolutionssrl@gmail.com
+  password: Internetes3!
+  properties:
+    mail.transport.protocol: smtp
+    mail.smtp.port: 25
+    mail.smtp.auth: true
+    mail.smtp.starttls.enable: true
+    mail.smtp.starttls.required: true

@@ -12,6 +12,12 @@ import java.util.Objects;
  */
 public class Subscriber {
 
+    public static final String INVALID_STATUS = "Status can not be diff 0 or 1";
+    public static final String INVALID_FIRST_NAME = "First name can not be empty";
+    public static final String INVALID_LAST_NAME = "Last name can not be empty";
+    public final String INVALID_EMAIL = "Email can not be empty";
+    public final String INVALID_CELLPHONE = "Cellphone can not be empty";
+
     private Long uid;
 
     private Integer status;
@@ -27,6 +33,23 @@ public class Subscriber {
     private Timestamp createDate;
 
     private Timestamp lastUpdateDate;
+
+    public static Subscriber at(Integer status, String firstName, String lastName, String email, String cellphone) {
+        if (firstName.isEmpty()) throw new RuntimeException(INVALID_FIRST_NAME);
+        if (lastName.isEmpty()) throw new RuntimeException(INVALID_LAST_NAME);
+        return new Subscriber(status, firstName, lastName, email, cellphone);
+    }
+
+    public Subscriber(Integer status, String firstName, String lastName, String email, String cellphone) {
+        this.status = status;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.cellphone = cellphone;
+    }
+
+    public Subscriber() {
+    }
 
     // Getters & Setters
     public Long getUid() {
